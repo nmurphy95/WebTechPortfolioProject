@@ -1,102 +1,66 @@
 import React, { Component } from 'react';
-import axios from 'axios';
-
+import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import Home from './pages/Home';
+import Login from './components/Login';
+import NavBar from './components/NavBar';
+import Projects from './pages/Projects';
+import axios from 'axios';
 import Fetch from './components/Fetch';
+import { withRouter } from 'react-router-dom';
 
 class App extends Component {
-  state = {
-    data: [],
-    id: 0,
-    message: null,
-    intervalIsSet: false,
-    idToDelete: null,
-    idToUpdate: null,
-    objectToUpdate: null,
-    dataLoaded: false,
-  };
+  constructor(props) {
+    super(props);
 
-  componentDidMount() {
-    this.getDataFromDb();
-    // if (!this.state.intervalIsSet) {
-    //   let interval = setInterval(this.getDataFromDb, 1000);
-    //   this.setState({ intervalIsSet: interval });
-    // }
+    this.previousLocation = this.props.location;
+
+    this.state = {
+      isLoggedIn: false,
+    };
+    
+    this.handleLogin = this.handleLogin.bind(this);
   }
 
-  componentWillUnmount() {
-    if (this.state.intervalIsSet) {
-      clearInterval(this.state.intervalIsSet);
-      this.setState({ intervalIsSet: null });
+  componentDidUpdate() {
+    const { location } = this.props;
+    if (!(location.state && location.state.modal)) {
+      this.previousLocation = this.props.location;
     }
   }
 
-  getDataFromDb = () => {
-    fetch('http://localhost:3001/api/getData')
-      .then((data) => data.json())
-      .then((res) => this.setState({ data: res.data }))
-  };
-
-  mapContent = (content) => {
-    return content.map( item => (
-      <li>{item}</li>
-    ));
+  handleLogin = () => {
+    this.setState({isLoggedIn: !this.state.isLoggedIn});
+    console.log(this.state.isLoggedIn);
   }
 
-  mapSectionContent = (sectionContent) => {
-    return sectionContent.map( item => (
-      <div>
-        {item.title !== "null" && <p><b>{item.title}</b></p>}
-        {item.dates !== "null" && <p>{item.dates}</p>}
-        <ul>
-        {this.mapContent(item.content)}
-        </ul>
-      </div>
-    ));
-  }
-
-  mapSection = (sections) => {
-    return sections.map( item => (
-      <div>
-        <h2>{item.title}</h2>
-        <div>
-          {this.mapSectionContent(item.sectionContent)}
-        </div>
-      </div>
-    ));
-  }
-
-  mapResume = () => {
-    if (this.state.data.length > 0) {
-      return (
-        <div>
-          <h1>{this.state.data[0].name}</h1>
-          <div>
-            {this.mapSection(this.state.data[0].sections)}
-          </div>
-
-        </div>
-      );
-    }
-    return <div>Nothing to see here</div>
-  }
+  render() {
+    const { location } = this.props;
+    const { isLoggedIn } = this.state;
+    const isModal = (
+      location.state &&
+      location.state.modal &&
+      this.previousLocation !== location
+    );
 
 
-  render () {
-    const { data } = this.state;
     return (
-      <div>
-        {this.mapResume()}
-      </div>
+      
+        <div className="App">
+          <NavBar onSubmit={this.handleLogin} isLoggedIn={isLoggedIn} />
+          <Switch location={isModal ? this.previousLocation : location}>
+            <Route exact path="/"
+              render={(props) => <Home isLoggedIn={isLoggedIn} />}
+            />
+            <Route exact path="/projects" component={Projects} />
+            <Route exact path="/login" component={Login} />
+          </Switch>
+          {isModal
+            ? <Route path="/login" component={Login} />
+            : null
+          }
+        </div>
     );
   }
 }
 
-//   return (
-//     <div className="App">
-//       <Home />
-//     </div>
-//   );
-// }
-
-export default App;
+export default withRouter(App);

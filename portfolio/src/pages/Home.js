@@ -1,16 +1,20 @@
 import React, { Component } from 'react';
 
 class Home extends Component {
-    state = {
-        data: [],
-        id: 0,
-        message: null,
-        intervalIsSet: false,
-        idToDelete: null,
-        idToUpdate: null,
-        objectToUpdate: null,
-        dataLoaded: false,
-      };
+    constructor(props) {
+        super(props);
+        this.state = {
+            data: [],
+            id: 0,
+            message: null,
+            intervalIsSet: false,
+            idToDelete: null,
+            idToUpdate: null,
+            objectToUpdate: null,
+            dataLoaded: false,
+          };
+    }
+
     
       componentDidMount() {
         this.getDataFromDb();
@@ -31,6 +35,7 @@ class Home extends Component {
         fetch('http://localhost:3001/api/getData')
           .then((data) => data.json())
           .then((res) => this.setState({ data: res.data }))
+          .then(() => console.log(this.state.data));
       };
     
       mapContent = (content) => {
@@ -79,7 +84,10 @@ class Home extends Component {
     
     
       render () {
-        const { data } = this.state;
+        const { isLoggedIn } = this.state;
+        if (isLoggedIn) {
+            return <h1>Yeah</h1>;
+        }
         return (
           <div>
             {this.mapResume()}

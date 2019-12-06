@@ -1,29 +1,45 @@
 import React, { Component } from 'react';
+import { NavLink, Link } from 'react-router-dom';
 
-class Home extends Component {
-    render() {
-        const {selectedSection, redirect} = this.state
-        const { colorIndex } = this.props
-        // if (this.state.redirect) {
-        //     return (
-        //         <Redirect to={`${selectedSection}`} push />
-        //     )
-        // } else {
-            return (
-                <div className='navBar'>
-                    <div className='navWrapper'>
-                        <div className='logo pointer' onClick={()=>this.selectSection('/')} >
-                            <Logo colorIndex={colorIndex} />
-                        </div>
-                        <div className='lhs'>
-                            <span className='navBarText' onClick={()=>this.selectSection('/')}> Work </span>
-                        </div>
-                        <div className='rhs'>
-                            <span className='navBarText' onClick={()=>this.selectSection('/projects')}> Projects </span>
-                        </div>
-                    </div>
-                </div>
-            )
-        }
+class NavBar extends Component {
+    constructor(props) {
+        super(props);
+        console.log(this.props);
+        this.toggleLogin = this.toggleLogin.bind(this);
     }
+
+    guestGreeting = () => {
+        return
+    }
+
+    toggleLogin = () => {
+        this.props.onSubmit();
+    }
+    render() {
+        const { isLoggedIn } = this.props;
+        return(
+            <nav className="navBar">
+            <ul>
+                <li><NavLink exact to="/">Home</NavLink></li>
+                <li><NavLink to="/projects/">Projects</NavLink></li>
+                <li><button onClick={this.toggleLogin}>{isLoggedIn ? 'Nolan Murphy' : 'Log In'}</button></li>
+                {/* This is for logging in */}
+                {/* <li>{ this.props.isLoggedIn 
+                    ? <NavLink to="/signout/">Nolan Murphy</NavLink> 
+                    : <NavLink to={{
+                        pathname: "/login/",
+                        state: { modal: true } 
+                        }}
+                    >
+                        Log In
+                    </NavLink>
+                }</li> */}
+            </ul>
+        </nav>
+        )
+        
+    }
+}
+
+export default NavBar;
 // }
