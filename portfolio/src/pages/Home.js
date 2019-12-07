@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { contentEditable } from '../util/Editable';
+import axios from 'axios';
+import strings from '../util/strings';
 
 class Home extends Component {
     constructor(props) {
@@ -36,9 +38,13 @@ class Home extends Component {
   }
 
   handleSave = (element) => {
-    console.log(element);
+    const { data } = this.state;
+    console.log(element.innerText);
     console.log(element.id);
-    return;
+    data[0][element.id] = element.innerText;
+    this.setState({ data: data }, () => {
+      this.updateDb();
+    });
   }
 
   getDataFromDb = () => {
@@ -48,31 +54,45 @@ class Home extends Component {
       .then(() => console.log(this.state.data));
   };
 
-  mapContent = (content) => {
+  updateDb = () => {
+    console.log(this.state.data[0]);
+    axios.post(strings.PUT_DATA, {
+      id: 4,
+      update: this.state.data,
+    })
+      .then((res) => console.log(res));
+    axios.delete(strings.DELETE_DATA, {
+      id: this.state.data[0].id,
+    });
+  };
+
+  mapContent = (content, index) => {
+    this.parentIndex = index;
     let EditableLI = contentEditable('li');
     return content.map( (item, index) => (
       this.props.isLoggedIn
-        ? <EditableLI value={item} key={index} id={"sections.sectionContent.content[" + index + "]"} onSave={this.handleSave}/>
-        : <li>{item}</li>
+        ? <EditableLI value={item} key={index} id={"sections[" + this.parentIndex + "].sectionContent.content[" + index + "]"} onSave={this.handleSave}/>
+        : <li key={index}>{item}</li>
       
     ));
   }
 
-  mapSectionContent = (sectionContent) => {
+  mapSectionContent = (sectionContent, index) => {
+    this.parentIndex = index;
     if (this.props.isLoggedIn) {
       let EditableP = contentEditable('p');
       return sectionContent.map( (item, index) => (
-        <div>
-          {item.title !== "null" && <EditableP value={item.title} style={{fontWeight: 'bold' }} key={index + item.title} id={"sections.sectionContent[" + index + "].title"} onSave={this.handleSave}/>}
-          {item.dates !== "null" && <EditableP value={item.dates} key={index + item.dates[2]} id={"sections.sectionContent[" + index + "].dates"} onSave={this.handleSave} />}
+        <div key={index}>
+          {item.title !== "null" && <EditableP value={item.title} style={{fontWeight: 'bold' }} key={index + item.title} id={"sections[" + this.parentIndex + "].sectionContent[" + index + "].title"} onSave={this.handleSave}/>}
+          {item.dates !== "null" && <EditableP value={item.dates} key={index + item.dates[2]} id={"sections[" + this.parentIndex + "].sectionContent[" + index + "].dates"} onSave={this.handleSave} />}
           <ul>
-          {this.mapContent(item.content)}
+          {this.mapContent(item.content, index)}
           </ul>
         </div>
       ));
     } else {
-        return sectionContent.map( item => (
-          <div>
+        return sectionContent.map( (item, index) => (
+          <div key={index + item.title}>
             {item.title !== "null" && <p><b>{item.title}</b></p>}
             {item.dates !== "null" && <p>{item.dates}</p>}
             <ul>
@@ -86,12 +106,12 @@ class Home extends Component {
   mapSection = (sections) => {
     let EditableH2 = contentEditable('h2');
     return sections.map( (item,index) => (
-      <div>
+      <div key={index + ".sections"}>
         {this.props.isLoggedIn 
-          ? <EditableH2 value={item.title} key={index + ".sections"} id={"sections[" + index + "].title"} onSave={this.handleSave} />
+          ? <EditableH2 value={item.title} id={"sections[" + index + "].title"} onSave={this.handleSave} />
           :<h2>{item.title}</h2>}
         <div>
-          {this.mapSectionContent(item.sectionContent)}
+          {this.mapSectionContent(item.sectionContent, index)}
         </div>
       </div>
     ));
@@ -101,9 +121,9 @@ class Home extends Component {
     if (this.state.data.length > 0) {
       let EditableH1 = contentEditable('h1');
       return (
-        <div>
+        <div key="name">
           {this.props.isLoggedIn 
-            ? <EditableH1 value={this.state.data[0].name} key="name" id="name" onSave={this.handleSave} />
+            ? <EditableH1 value={this.state.data[0].name} id="name" onSave={this.handleSave} />
             : <h1>{this.state.data[0].name}</h1>}
           <div>
             {this.mapSection(this.state.data[0].sections)}
