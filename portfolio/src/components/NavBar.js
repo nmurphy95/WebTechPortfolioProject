@@ -22,7 +22,7 @@ class NavBar extends Component {
             <ul>
                 <li><NavLink exact to="/">Home</NavLink></li>
                 <li><NavLink to="/projects/">Projects</NavLink></li>
-                <li><button onClick={this.toggleLogin}>{isLoggedIn ? 'Nolan Murphy' : 'Log In'}</button></li>
+                <li><button onClick={this.props.onSubmit}>{isLoggedIn ? 'Nolan Murphy' : 'Log In'}</button></li>
                 {/* This is for logging in */}
                 {/* <li>{ this.props.isLoggedIn 
                     ? <NavLink to="/signout/">Nolan Murphy</NavLink> 

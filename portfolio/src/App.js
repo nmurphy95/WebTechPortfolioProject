@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {BrowserRouter, Route, Switch} from 'react-router-dom';
+import {Route, Switch} from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './components/Login';
 import NavBar from './components/NavBar';
@@ -7,6 +7,7 @@ import Projects from './pages/Projects';
 import axios from 'axios';
 import Fetch from './components/Fetch';
 import { withRouter } from 'react-router-dom';
+import VRL from './projects/Diffraction/VRL';
 
 class App extends Component {
   constructor(props) {
@@ -53,6 +54,7 @@ class App extends Component {
             />
             <Route exact path="/projects" component={Projects} />
             <Route exact path="/login" component={Login} />
+            <Route exact path={"/projects/VRL"} component={VRL} />
           </Switch>
           {isModal
             ? <Route path="/login" component={Login} />
