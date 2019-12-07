@@ -5,7 +5,6 @@ import Login from './components/Login';
 import NavBar from './components/NavBar';
 import Projects from './pages/Projects';
 import axios from 'axios';
-import Fetch from './components/Fetch';
 import { withRouter } from 'react-router-dom';
 import VRL from './projects/Diffraction/VRL';
 
